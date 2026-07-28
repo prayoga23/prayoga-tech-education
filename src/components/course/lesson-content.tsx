@@ -37,7 +37,7 @@ export function LessonContent({ lesson }: LessonContentProps) {
           if (paragraph.startsWith("```")) {
             const cleanCode = paragraph.replace(/```[a-z]*/g, "").trim();
             return (
-              <pre key={i} className="p-4 rounded-xl bg-muted border border-border font-mono text-xs overflow-x-auto text-emerald-600">
+              <pre key={i} className="p-4 rounded-xl bg-muted/80 border border-border font-mono text-xs overflow-x-auto text-emerald-400">
                 <code>{cleanCode}</code>
               </pre>
             );
@@ -47,12 +47,12 @@ export function LessonContent({ lesson }: LessonContentProps) {
       </div>
 
       {lesson.hints && lesson.hints.length > 0 && (
-        <div className="rounded-xl border border-amber-500/30 bg-amber-100/50 p-4 space-y-2">
-          <div className="flex items-center gap-2 text-amber-600 font-bold text-xs">
-            <Lightbulb className="h-4 w-4" />
+        <div className="rounded-xl border border-amber-500/40 bg-amber-500/10 p-4 space-y-2 shadow-sm">
+          <div className="flex items-center gap-2 text-amber-400 font-bold text-xs">
+            <Lightbulb className="h-4 w-4 text-amber-400" />
             <span>Petunjuk Bantuan (Hint):</span>
           </div>
-          <ul className="list-disc list-inside text-xs text-amber-700/90 space-y-1">
+          <ul className="list-disc list-inside text-xs text-amber-200/95 space-y-1 font-medium">
             {lesson.hints.map((hint, idx) => (
               <li key={idx}>{hint}</li>
             ))}

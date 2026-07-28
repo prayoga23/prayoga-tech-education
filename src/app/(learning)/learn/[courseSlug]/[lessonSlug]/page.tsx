@@ -27,6 +27,7 @@ export default function LessonPlayerPage({ params }: LessonPlayerProps) {
 
   const [code, setCode] = useState(lesson?.initialCode || "// Tulis kode kamu di sini\n");
   const [language, setLanguage] = useState<ProgrammingLanguage>(lesson?.language || "javascript");
+  const [customInput, setCustomInput] = useState("");
   const [isRunning, setIsRunning] = useState(false);
   const [result, setResult] = useState<CodeSubmissionResult | null>(null);
 
@@ -40,7 +41,7 @@ export default function LessonPlayerPage({ params }: LessonPlayerProps) {
 
   const handleRunCode = async () => {
     setIsRunning(true);
-    const evalResult = await evaluateLessonCode(lesson, code);
+    const evalResult = await evaluateLessonCode(lesson, code, customInput);
     setResult(evalResult);
     setIsRunning(false);
 
@@ -55,6 +56,7 @@ export default function LessonPlayerPage({ params }: LessonPlayerProps) {
 
   const handleResetCode = () => {
     setCode(lesson.initialCode);
+    setCustomInput("");
     setResult(null);
   };
 
@@ -87,11 +89,13 @@ export default function LessonPlayerPage({ params }: LessonPlayerProps) {
             <CodeEditor value={code} onChange={setCode} language={language} />
           </div>
 
-          <div className="h-56">
+          <div className="h-64 border-t border-border">
             <OutputPanel
               result={result}
               logs={result?.logs || []}
               error={result?.success === false ? result?.output : undefined}
+              customInput={customInput}
+              onCustomInputChange={setCustomInput}
             />
           </div>
         </div>
@@ -99,3 +103,4 @@ export default function LessonPlayerPage({ params }: LessonPlayerProps) {
     </div>
   );
 }
+

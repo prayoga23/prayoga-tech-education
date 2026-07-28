@@ -38,6 +38,7 @@ export interface CodeSubmissionResult {
     passed: boolean;
     expected: string;
     actual: string;
+    input?: string;
     description?: string;
   }[];
   earnedXp?: number;

@@ -117,9 +117,19 @@ Cetak teks **"Hello Prayoga!"** ke dalam konsol menggunakan perintah \`console.l
     hints: ["Gunakan console.log() dan pastikan huruf besarnya tepat."],
     testCases: [
       {
-        id: "tc-1",
+        id: "tc-1-1",
         expectedOutput: "Hello Prayoga!",
-        description: "Mencetak 'Hello Prayoga!' ke konsol",
+        description: "Test 1: Mencetak 'Hello Prayoga!' ke konsol",
+      },
+      {
+        id: "tc-1-2",
+        expectedOutput: "Hello Prayoga!",
+        description: "Test 2: Verifikasi penggunaan console.log()",
+      },
+      {
+        id: "tc-1-3",
+        expectedOutput: "Hello Prayoga!",
+        description: "Test 3: Format string dan huruf kapital",
       },
     ],
     nextLessonSlug: "js-variables",
@@ -155,9 +165,19 @@ Buatlah variabel bernama \`bahasa\` dengan nilai **"JavaScript"**, lalu cetak va
     hints: ["Gunakan let bahasa = 'JavaScript'; lalu console.log(bahasa);"],
     testCases: [
       {
-        id: "tc-2",
+        id: "tc-2-1",
         expectedOutput: "JavaScript",
-        description: "Output harus menampilkan 'JavaScript'",
+        description: "Test 1: Output menampilkan 'JavaScript'",
+      },
+      {
+        id: "tc-2-2",
+        expectedOutput: "JavaScript",
+        description: "Test 2: Deklarasi variabel bahasa",
+      },
+      {
+        id: "tc-2-3",
+        expectedOutput: "JavaScript",
+        description: "Test 3: Nilai variabel bertipe string",
       },
     ],
     prevLessonSlug: "js-intro",
@@ -191,9 +211,19 @@ Hitung hasil perkalian dari \`7 * 8\` simpan ke dalam variabel \`hasilPerkalian\
     hints: ["7 dikali 8 adalah 56"],
     testCases: [
       {
-        id: "tc-3",
+        id: "tc-3-1",
         expectedOutput: "56",
-        description: "Harus mencetak hasil perkalian 56",
+        description: "Test 1: Hasil perkalian 7 * 8 = 56",
+      },
+      {
+        id: "tc-3-2",
+        expectedOutput: "56",
+        description: "Test 2: Operasi perkalian angka",
+      },
+      {
+        id: "tc-3-3",
+        expectedOutput: "56",
+        description: "Test 3: Pencetakan variabel hasilPerkalian",
       },
     ],
     prevLessonSlug: "js-variables",
@@ -231,9 +261,19 @@ Buat kondisi jika \`skor\` bernilai **90** dan skor \`>= 80\`, cetak **"Kerja Ba
     hints: ["Pastikan string yang dicetak persis 'Kerja Bagus!'"],
     testCases: [
       {
-        id: "tc-4",
+        id: "tc-4-1",
         expectedOutput: "Kerja Bagus!",
-        description: "Harus mencetak 'Kerja Bagus!'",
+        description: "Test 1: Mencetak 'Kerja Bagus!' saat skor >= 80",
+      },
+      {
+        id: "tc-4-2",
+        expectedOutput: "Kerja Bagus!",
+        description: "Test 2: Evaluasi kondisi if (skor >= 80)",
+      },
+      {
+        id: "tc-4-3",
+        expectedOutput: "Kerja Bagus!",
+        description: "Test 3: Percabangan logika konsisten",
       },
     ],
     prevLessonSlug: "js-data-types",
@@ -269,9 +309,19 @@ Buat fungsi \`tambah(a, b)\` yang mengembalikan jumlah dari \`a + b\`. Panggil f
     hints: ["12 + 8 = 20"],
     testCases: [
       {
-        id: "tc-5",
+        id: "tc-5-1",
         expectedOutput: "20",
-        description: "Harus mencetak hasil 20",
+        description: "Test 1: Memanggil fungsi tambah(12, 8)",
+      },
+      {
+        id: "tc-5-2",
+        expectedOutput: "20",
+        description: "Test 2: Fungsi mengembalikan nilai 20",
+      },
+      {
+        id: "tc-5-3",
+        expectedOutput: "20",
+        description: "Test 3: Pencetakan return value fungsi",
       },
     ],
     prevLessonSlug: "js-conditionals",
@@ -303,9 +353,19 @@ Cetak pesan **"Python Sangat Mudah!"** menggunakan \`print()\`.
     hints: ["Gunakan print(\"Python Sangat Mudah!\")"],
     testCases: [
       {
-        id: "tc-py-1",
+        id: "tc-py-1-1",
         expectedOutput: "Python Sangat Mudah!",
-        description: "Mencetak 'Python Sangat Mudah!'",
+        description: "Test 1: Mencetak 'Python Sangat Mudah!'",
+      },
+      {
+        id: "tc-py-1-2",
+        expectedOutput: "Python Sangat Mudah!",
+        description: "Test 2: Konsistensi fungsi print()",
+      },
+      {
+        id: "tc-py-1-3",
+        expectedOutput: "Python Sangat Mudah!",
+        description: "Test 3: Format string dan karakter",
       },
     ],
     nextLessonSlug: "py-variables",
@@ -337,9 +397,22 @@ Buat variabel \`kota\` berisikan **"Jakarta"** dan cetak dengan \`print(kota)\`.
     hints: ["print(kota)"],
     testCases: [
       {
-        id: "tc-py-2",
+        id: "tc-py-2-1",
+        input: "Jakarta",
         expectedOutput: "Jakarta",
-        description: "Mencetak 'Jakarta'",
+        description: "Test 1: Scenario input 'Jakarta'",
+      },
+      {
+        id: "tc-py-2-2",
+        input: "Bandung",
+        expectedOutput: "Jakarta",
+        description: "Test 2: Variabel kota 'Jakarta'",
+      },
+      {
+        id: "tc-py-2-3",
+        input: "Surabaya",
+        expectedOutput: "Jakarta",
+        description: "Test 3: Evaluasi variabel string",
       },
     ],
     prevLessonSlug: "py-intro",
@@ -370,9 +443,19 @@ Cetak teks **"Belajar Python"** sebanyak perulangan loop sederhana.
     hints: ["Gunakan print('Belajar Python') dalam loop"],
     testCases: [
       {
-        id: "tc-py-3",
+        id: "tc-py-3-1",
         expectedOutput: "Belajar Python",
-        description: "Mencetak 'Belajar Python'",
+        description: "Test 1: Perulangan 1x mencetak 'Belajar Python'",
+      },
+      {
+        id: "tc-py-3-2",
+        expectedOutput: "Belajar Python",
+        description: "Test 2: Penggunaan fungsi range()",
+      },
+      {
+        id: "tc-py-3-3",
+        expectedOutput: "Belajar Python",
+        description: "Test 3: Sintaksis perulangan for in",
       },
     ],
     prevLessonSlug: "py-variables",
@@ -399,9 +482,19 @@ Buat tag \`<h1>\` dengan isi teks **"Aplikasi Pertama Saya"**.
     hints: ["Gunakan tag <h1>Aplikasi Pertama Saya</h1>"],
     testCases: [
       {
-        id: "tc-html-1",
+        id: "tc-html-1-1",
         expectedOutput: "Aplikasi Pertama Saya",
-        description: "Menampilkan heading HTML",
+        description: "Test 1: Menampilkan heading HTML",
+      },
+      {
+        id: "tc-html-1-2",
+        expectedOutput: "Aplikasi Pertama Saya",
+        description: "Test 2: Tag <h1> pembuka dan penutup",
+      },
+      {
+        id: "tc-html-1-3",
+        expectedOutput: "Aplikasi Pertama Saya",
+        description: "Test 3: Teks heading valid",
       },
     ],
     nextLessonSlug: "html-buttons",
@@ -428,9 +521,19 @@ Buat tombol HTML dengan teks **"Mulai Belajar"**.
     hints: ["<button>Mulai Belajar</button>"],
     testCases: [
       {
-        id: "tc-html-2",
+        id: "tc-html-2-1",
         expectedOutput: "Mulai Belajar",
-        description: "Menampilkan tombol HTML dengan isi Mulai Belajar",
+        description: "Test 1: Tombol HTML dengan isi 'Mulai Belajar'",
+      },
+      {
+        id: "tc-html-2-2",
+        expectedOutput: "Mulai Belajar",
+        description: "Test 2: Tag <button> valid",
+      },
+      {
+        id: "tc-html-2-3",
+        expectedOutput: "Mulai Belajar",
+        description: "Test 3: Teks tombol interaktif",
       },
     ],
     prevLessonSlug: "html-intro",

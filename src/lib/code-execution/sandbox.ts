@@ -123,9 +123,19 @@ function transpilePythonToJS(pythonCode: string): string {
 
 export async function executeInSandbox(
   code: string,
-  language: ProgrammingLanguage
+  language: ProgrammingLanguage,
+  inputData?: string
 ): Promise<ExecutionOutput> {
   const logs: string[] = [];
+  const inputLines = inputData ? inputData.split(/\r?\n/) : [];
+  let inputIndex = 0;
+
+  const customInput = (_promptMsg?: any) => {
+    if (inputIndex < inputLines.length) {
+      return inputLines[inputIndex++];
+    }
+    return "";
+  };
 
   if (language === "javascript") {
     try {
@@ -140,8 +150,8 @@ export async function executeInSandbox(
           logs.push("[INFO] " + args.map((a) => (typeof a === "object" ? JSON.stringify(a) : String(a))).join(" ")),
       };
 
-      const runner = new Function("console", code);
-      const result = runner(customConsole);
+      const runner = new Function("console", "prompt", code);
+      const result = runner(customConsole, customInput);
 
       return {
         logs: logs.length > 0 ? logs : ["Code executed successfully (no console output)."],
@@ -204,6 +214,7 @@ export async function executeInSandbox(
 
       const env: Record<string, any> = {
         print: customPrint,
+        input: customInput,
         range: pyRange,
         len: pyLen,
         str: (v: any) => String(v),
