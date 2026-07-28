@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, use } from "react";
 import { useRouter } from "next/navigation";
+import confetti from "canvas-confetti";
 import { SEED_COURSES, SEED_LESSONS } from "../../../../../../firebase/seed/data";
 import { LessonHeader } from "@/components/course/lesson-header";
 import { LessonContent } from "@/components/course/lesson-content";
@@ -47,10 +48,12 @@ export default function LessonPlayerPage({ params }: LessonPlayerProps) {
 
     if (evalResult.success) {
       await saveUserProgress(lesson.slug, lesson.xpReward);
-      // Redirect to celebratory result page after 1.5 seconds or immediately
-      setTimeout(() => {
-        router.push(`/learn/${courseSlug}/${lessonSlug}/result`);
-      }, 1200);
+      // Trigger celebratory confetti animation on page
+      confetti({
+        particleCount: 80,
+        spread: 60,
+        origin: { y: 0.7 },
+      });
     }
   };
 
@@ -85,15 +88,17 @@ export default function LessonPlayerPage({ params }: LessonPlayerProps) {
             isRunning={isRunning}
           />
 
-          <div className="flex-1 min-h-[300px]">
+          <div className="flex-1 min-h-[250px]">
             <CodeEditor value={code} onChange={setCode} language={language} />
           </div>
 
-          <div className="h-64 border-t border-border">
+          <div className="h-72 border-t border-border">
             <OutputPanel
               result={result}
               logs={result?.logs || []}
               error={result?.success === false ? result?.output : undefined}
+              code={code}
+              language={language}
               customInput={customInput}
               onCustomInputChange={setCustomInput}
             />
@@ -103,4 +108,5 @@ export default function LessonPlayerPage({ params }: LessonPlayerProps) {
     </div>
   );
 }
+
 
