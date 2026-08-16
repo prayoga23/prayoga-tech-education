@@ -1,15 +1,16 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Flame, Award, User, LogIn, LayoutDashboard } from "lucide-react";
-import { useAuth } from "@/hooks/use-auth";
+import { Flame, Award, LogIn, LayoutDashboard, LogOut, Settings, ChevronDown } from "lucide-react";
+import { useAuth } from "@/context/auth-context";
 
 export function Navbar() {
   const pathname = usePathname();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, logout } = useAuth();
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-40 w-full glass">
@@ -66,12 +67,59 @@ export function Navbar() {
                 <span>{user.xp} XP</span>
               </div>
 
-              <Link href="/dashboard">
-                <Button size="sm" variant="primary" className="gap-2">
-                  <LayoutDashboard className="h-4 w-4" />
-                  Dashboard
-                </Button>
-              </Link>
+              {/* User Dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => setUserMenuOpen(!userMenuOpen)}
+                  className="flex items-center gap-2 rounded-xl border border-border bg-surface-elevated hover:bg-muted p-1.5 pr-2.5 transition-colors"
+                >
+                  <img
+                    src={user.photoURL || `https://api.dicebear.com/7.x/bottts/svg?seed=${user.displayName}`}
+                    alt={user.displayName}
+                    className="h-7 w-7 rounded-full bg-indigo-500/20 object-cover"
+                  />
+                  <span className="text-xs font-semibold text-white max-w-[90px] truncate hidden sm:inline">{user.displayName}</span>
+                  <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+                </button>
+
+                {userMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-52 rounded-xl border border-border bg-card p-1.5 shadow-2xl z-50 animate-in fade-in slide-in-from-top-2">
+                    <div className="px-3 py-2 border-b border-border/60 mb-1">
+                      <p className="text-xs font-semibold text-white truncate">{user.displayName}</p>
+                      <p className="text-[11px] text-muted-foreground truncate">{user.email}</p>
+                    </div>
+
+                    <Link
+                      href="/dashboard"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-muted-foreground hover:bg-indigo-500/10 hover:text-white transition-colors"
+                    >
+                      <LayoutDashboard className="h-4 w-4 text-indigo-400" />
+                      Dashboard Learner
+                    </Link>
+
+                    <Link
+                      href="/dashboard/settings"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-muted-foreground hover:bg-indigo-500/10 hover:text-white transition-colors"
+                    >
+                      <Settings className="h-4 w-4 text-indigo-400" />
+                      Pengaturan Profil
+                    </Link>
+
+                    <button
+                      onClick={() => {
+                        setUserMenuOpen(false);
+                        logout();
+                      }}
+                      className="w-full flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-rose-400 hover:bg-rose-500/10 transition-colors mt-0.5"
+                    >
+                      <LogOut className="h-4 w-4" />
+                      Keluar (Logout)
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           ) : (
             <div className="flex items-center gap-2">
