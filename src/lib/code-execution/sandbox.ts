@@ -11,6 +11,17 @@ function transpilePythonToJS(pythonCode: string): string {
   const jsLines: string[] = [];
   const indentStack: number[] = [0];
 
+  // Pass 1: Find defined classes
+  const definedClasses = new Set<string>();
+  lines.forEach((line) => {
+    const classMatch = /^\s*class\s+([a-zA-Z0-9_]+)/.exec(line);
+    if (classMatch) {
+      definedClasses.add(classMatch[1]);
+    }
+  });
+
+  let hasParentClass = false;
+
   lines.forEach((originalLine) => {
     // 1. Strip comments (#) unless inside string quotes
     let lineWithoutComment = "";
@@ -46,6 +57,26 @@ function transpilePythonToJS(pythonCode: string): string {
 
     let trimmed = lineWithoutComment.trim();
 
+    // Ignore import statements (handled by mock env)
+    if (trimmed.startsWith("import ") || trimmed.startsWith("from ")) {
+      return;
+    }
+
+    // Replace pass with empty statement
+    if (trimmed === "pass") {
+      jsLines.push(" ".repeat(indentLevel) + ";");
+      return;
+    }
+
+    // Replace self. with this.
+    trimmed = trimmed.replace(/\bself\./g, "this.");
+
+    // Auto-insert 'new' before defined class instantiations
+    definedClasses.forEach((cls) => {
+      const regex = new RegExp(`(?<!class\\s+|extends\\s+|new\\s+)\\b${cls}\\s*\\(`, "g");
+      trimmed = trimmed.replace(regex, `new ${cls}(`);
+    });
+
     // 4. Handle Python f-strings: f"Halo {nama}" -> `Halo ${nama}`
     trimmed = trimmed.replace(/f(["'])(.*?)\1/g, (_match, _quote, contents) => {
       const convertedStr = contents.replace(/\{([^}]+)\}/g, "${$1}");
@@ -54,6 +85,9 @@ function transpilePythonToJS(pythonCode: string): string {
 
     // Replace floor division operator `//` with Math.floor(a / b)
     trimmed = trimmed.replace(/([a-zA-Z0-9_().]+)\s*\/\/\s*([a-zA-Z0-9_().]+)/g, "Math.floor($1 / $2)");
+
+    // Replace division operator `/` with pyDiv(a, b) to support ZeroDivisionError
+    trimmed = trimmed.replace(/([a-zA-Z0-9_().]+)\s*\/\s*([a-zA-Z0-9_().]+)/g, "pyDiv($1, $2)");
 
     // Replace Python literals & keywords
     trimmed = trimmed
@@ -79,6 +113,12 @@ function transpilePythonToJS(pythonCode: string): string {
         jsLines.push(" ".repeat(indentLevel) + `else if (${cond}) {`);
       } else if (headerContent === "else") {
         jsLines.push(" ".repeat(indentLevel) + `else {`);
+      } else if (headerContent === "try") {
+        jsLines.push(" ".repeat(indentLevel) + `try {`);
+      } else if (headerContent.startsWith("except")) {
+        jsLines.push(" ".repeat(indentLevel) + `catch (err) {`);
+      } else if (headerContent === "finally") {
+        jsLines.push(" ".repeat(indentLevel) + `finally {`);
       } else if (headerContent.startsWith("while ")) {
         const cond = headerContent.slice(6).trim();
         jsLines.push(" ".repeat(indentLevel) + `while (${cond}) {`);
@@ -91,12 +131,43 @@ function transpilePythonToJS(pythonCode: string): string {
         } else {
           jsLines.push(" ".repeat(indentLevel) + `${headerContent} {`);
         }
+      } else if (headerContent.startsWith("class ")) {
+        const classMatch = /^class\s+([a-zA-Z0-9_]+)(?:\((.*?)\))?$/.exec(headerContent);
+        if (classMatch) {
+          const className = classMatch[1];
+          const parentClass = classMatch[2];
+          if (parentClass) {
+            hasParentClass = true;
+            jsLines.push(" ".repeat(indentLevel) + `class ${className} extends ${parentClass} {`);
+          } else {
+            hasParentClass = false;
+            jsLines.push(" ".repeat(indentLevel) + `class ${className} {`);
+          }
+        } else {
+          jsLines.push(" ".repeat(indentLevel) + `${headerContent} {`);
+        }
       } else if (headerContent.startsWith("def ")) {
         const defMatch = /^def\s+([a-zA-Z0-9_]+)\s*\((.*?)\)$/.exec(headerContent);
         if (defMatch) {
           const fnName = defMatch[1];
-          const args = defMatch[2];
-          jsLines.push(" ".repeat(indentLevel) + `function ${fnName}(${args}) {`);
+          const rawArgs = defMatch[2];
+          const cleanArgs = rawArgs
+            .split(",")
+            .map((a) => a.trim())
+            .filter((a) => a !== "self" && a !== "")
+            .join(", ");
+
+          if (fnName === "__init__") {
+            jsLines.push(" ".repeat(indentLevel) + `constructor(${cleanArgs}) {`);
+            if (hasParentClass) {
+              jsLines.push(" ".repeat(indentLevel + 4) + `try { super(); } catch (e) {}`);
+            }
+          } else if (indentStack.length > 1) {
+            // inside a class block or nested block
+            jsLines.push(" ".repeat(indentLevel) + `${fnName}(${cleanArgs}) {`);
+          } else {
+            jsLines.push(" ".repeat(indentLevel) + `function ${fnName}(${cleanArgs}) {`);
+          }
         } else {
           jsLines.push(" ".repeat(indentLevel) + `${headerContent} {`);
         }
@@ -212,6 +283,24 @@ export async function executeInSandbox(
         return typeof val;
       };
 
+      const pyDiv = (a: number, b: number): number => {
+        if (b === 0) {
+          throw new Error("ZeroDivisionError: division by zero");
+        }
+        return a / b;
+      };
+
+      const virtualFiles: Record<string, string> = {};
+      const pyOpen = (filename: string, mode: string = "r") => {
+        return {
+          write: (text: string) => {
+            virtualFiles[filename] = (virtualFiles[filename] || "") + text;
+          },
+          read: () => virtualFiles[filename] || "",
+          close: () => {},
+        };
+      };
+
       const env: Record<string, any> = {
         print: customPrint,
         input: customInput,
@@ -222,9 +311,19 @@ export async function executeInSandbox(
         float: (v: any) => parseFloat(v),
         bool: (v: any) => Boolean(v),
         type: pyType,
+        pyDiv,
         sum: (arr: number[]) => (Array.isArray(arr) ? arr.reduce((a, b) => a + b, 0) : 0),
         max: (...args: any[]) => Math.max(...args.flat()),
         min: (...args: any[]) => Math.min(...args.flat()),
+        open: pyOpen,
+        math: {
+          sqrt: Math.sqrt,
+          pi: Math.PI,
+          pow: Math.pow,
+          floor: Math.floor,
+          ceil: Math.ceil,
+          abs: Math.abs,
+        },
         Math,
       };
 
